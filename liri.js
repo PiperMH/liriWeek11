@@ -12,10 +12,10 @@ var request = require('request');
 
 
 //variable containing plebian task option
-var plebInput = "";
+var userInput = "";
 
 //varibale containing plebian song or movie request
-var userChoice = "";
+var userSelection = "";
 
 //Variables for the specific options plebian can choose from
 var theTweets = "my-tweets";
@@ -30,50 +30,50 @@ prompt.start();
 
 	prompt.get({
 		properties: {
-		 plebInput: {
+		 userInput: {
 		  description: 'What do you choose?'
 			}
 		}
 	}, function(err, result){
-		plebInput = result.plebInput; //based on what the user inputs different things are done
+		userInput = result.userInput; //based on what the user inputs different things are done
 
 		//if user enters tweets it will run the myTwitter function
-		if(plebInput == theTweets){
+		if(userInput == theTweets){
 			litTweets();
 		} 
 		//if the user enters spotify-this-song it will prompt you and ask for the song you want to look up and then it will run the mySpotify function based on those results. if the user doesnt enter a song it defaults to whats my age again and gets that information
-		else if(plebInput == music){
+		else if(userInput == music){
 			prompt.get({
 				properties: {
-				 userChoice: {
+				 userSelection: {
 				  description: 'What song do you want to look up?'
 					}
 				}
 			}, function(err, result){
 
-				if(result.userChoice === ""){
-					userChoice = "what's my age again";
+				if(result.userSelection === ""){
+					userSelection = "what's my age again";
 				} else{
-					userChoice = result.userChoice;
+					userSelection = result.userSelection;
 				}
-				mySpotify(userChoice);
+				mySpotify(userSelection);
 			});
 		} 
 		// if the user selects movie it will prompt the user to state what movie they want to look up and then it will get that information from omdb api if the prompt is left blank the function will default and look up Mr Nobody and reutrn that information
-		else if(plebInput == movies){
+		else if(userInput == movies){
 			prompt.get({
 				properties: {
-				 userChoice: {
+				 userSelection: {
 				  description: 'What movie do you want to look up?'
 					}
 				}
 			}, function(err, result){
-				if(result.userChoice === ""){
-					userChoice = "Mr. Nobody";
+				if(result.userSelection === ""){
+					userSelection = "Mr. Nobody";
 				} else{
-					userChoice = result.userChoice;
+					userSelection = result.userSelection;
 				}
-				myMovies(userChoice);
+				myMovies(userSelection);
 			});
 		};
 	});
@@ -106,65 +106,44 @@ function mySpotify(userSelection){
   	secret: "56f5b6999f3246c98174372d39810c82"});
 
 	//this starts the search within spotify for the track and the query based on the userselection set in the if/else statement above.  if there is an error it throws the error and continues getting the information.  
-	if(!userselection){
-		userselection = "What's my age again";
-	}
 	
-	Spotify.search({type: 'track', query: userSelection}, function(err, data) {
-	    if (err) throw err;
+	spotify.search({type: 'track', query: userSelection}, 
+		function(err, data) {
+	    if (err) {console.log("Error occurred: " + err);
+        return;}
 	    //this sets the variable music to get the initial information from the object, just so it's easier to call in the for loop below
 		var music = data.tracks.items;
 		//this loops through the object that we get from spotify and then loops through each objects information to get what we need from spotify
-		    for (var i = 0; i<music.length; i++){
-		    	for (j=0; j<music[i].artists.length; j++){
-		    	    console.log("Artist: ") + music[i].artists[j].name;
-		        	console.log("Song Name: ") + music[i].name;
-		        	console.log("Preview Link of the song from Spotify: ") + music[i].preview_url;
-		        	console.log("Album Name: ") + music[i].album.name + "\n";
-		    	//this appends the data we receive from the spotify API to the log.txt file
-		    		fs.appendFile('log.txt', "\n");
-			   	    fs.appendFile('log.txt', "Artist: " + music[i].artists[j].name + "\n")
-			       	fs.appendFile('log.txt', "Song Name: " + music[i].name + "\n");
-			       	fs.appendFile('log.txt', "Preview Link of the song from Spotify: " + music[i].preview_url + "\n");
-			       	fs.appendFile('log.txt', "Album Name: " + music[i].album.name + "\n");
-			       	fs.appendFile('log.txt', "\n");
-		    	}
-		    }
+
+      	for (var i = 0; i < music.length; i++) {
+	        console.log(i);
+	        console.log("song name: " + music[i].name);
+	        console.log("preview song: " + music[i].preview_url);
+	        console.log("album: " + music[i].album.name);
+	        console.log("====================================");
+	      }
 	});
 } 
 
-function myMovies(type){
+function myMovies(userSelection){
 	
-	if(!type){
-		type = "mr nobdy";
-	}
 
 	//use request to access the omdb api and input the type variable that is defined above as the movie we are searching for
-	request('http://www.omdbapi.com/?t='+type+"&y=&plot=full&tomatoes=true&apikey=40e9cece", function (error, response, body) {
-		if(error) throw error;
+	request('http://www.omdbapi.com/?t='+userSelection+"&y=&plot=full&tomatoes=true&apikey=40e9cece", 
+		function (error, response, body) {
+		if (!error && response.statusCode === 200){
 		//JSON.parse the body of the result and store it in the variable json for easier access
 		json = JSON.parse(body);
 		//console.log each of the different things we need to get from the omdb api and add a title for each item and use the colors npm to make the title name a different color than the result for better user access
-		console.log('Title: ') + json.Title;
-		console.log('Year: ') + json.Year;
-		console.log('Country: ') + json.Country;
-		console.log('Language: ') + json.Language;
-		console.log('Actors: ') + json.Actors;
-		console.log('Plot: ') + json.Plot;
-		console.log('imdbRating: ') + json.imdbRating;
-		console.log('Rotten Tomatoes Rating: ') + json.tomatoRating;
-
-		//append the results to the log.txt file
-		fs.appendFile('log.txt', "\n");
-		fs.appendFile("log.txt", "\n" + "Title: " + json.Title + "\n");
-		fs.appendFile("log.txt", "Year: " + json.Year + "\n");
-		fs.appendFile("log.txt", "Country: " + json.Country + "\n");
-		fs.appendFile("log.txt", "Language: " + json.Language + "\n");
-		fs.appendFile("log.txt", "Actors: " + json.Actors + "\n");
-		fs.appendFile("log.txt", "Plot: " + json.Plot + "\n");
-		fs.appendFile("log.txt", "imdbRating: " + json.imdbRating + "\n");
-		fs.appendFile("log.txt", "Rotten Tomatoes Rating: " + json.tomatoRating + "\n");
-		
+		console.log('Title: ' + json.Title);
+		console.log('Year: ' + json.Year);
+		console.log('Country: ' + json.Country);
+		console.log('Language: ' + json.Language);
+		console.log('Actors: ' + json.Actors);
+		console.log('Plot: ' + json.Plot);
+		console.log('imdbRating: ' + json.imdbRating);
+		console.log('Rotten Tomatoes Rating: ' + json.tomatoRating);
+		}
 	});
 }
 
