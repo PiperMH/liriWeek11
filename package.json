@@ -1,7 +1,7 @@
 {
   "name": "liriweek",
   "version": "1.0.0",
-  "description": "",
+  "description": "why do i need a description? #yourmom",
   "main": "keys.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -15,5 +15,9 @@
   "bugs": {
     "url": "https://github.com/PiperMH/liriWeek11/issues"
   },
-  "homepage": "https://github.com/PiperMH/liriWeek11#readme"
+  "homepage": "https://github.com/PiperMH/liriWeek11#readme",
+  "dependencies": {
+    "inquirer": "^3.3.0",
+    "node-spotify-api": "^1.0.7"
+  }
 }
