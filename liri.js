@@ -1,7 +1,6 @@
 // Retrieves information within the keys.js file.
 // keys.js contains twitter keys
 var keys = require('./keys.js');
-var twitterKeys = keys.twitterKeys;
 
 // variables for the different entities of the app
 var fs = require('fs');
@@ -85,10 +84,9 @@ function litTweets(){
 
 	//object containing parameters for twitter call further in code
 	var params = {
-	screen_name: 'nodejs',
-	count: '20'};
+	screen_name: "nodejs"};
 
-	client.get('statuses/user_timeline', params, function(error,tweets,responses){
+	client.get('statuses/user_timeline', params, function(error,tweets,response){
 		if (!error) {
       	for (var i = 0; i < tweets.length; i++) {
         console.log(tweets[i].created_at);
@@ -106,15 +104,13 @@ function mySpotify(userSelection){
   	secret: "56f5b6999f3246c98174372d39810c82"});
 
 	//this starts the search within spotify for the track and the query based on the userselection set in the if/else statement above.  if there is an error it throws the error and continues getting the information.  
-	
 	spotify.search({type: 'track', query: userSelection}, 
 		function(err, data) {
 	    if (err) {console.log("Error occurred: " + err);
         return;}
 	    //this sets the variable music to get the initial information from the object, just so it's easier to call in the for loop below
 		var music = data.tracks.items;
-		//this loops through the object that we get from spotify and then loops through each objects information to get what we need from spotify
-
+		//this loops through the object that we get from spotify and logs the following info
       	for (var i = 0; i < music.length; i++) {
 	        console.log(i);
 	        console.log("song name: " + music[i].name);
